@@ -4,10 +4,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fontFamily="@font/public_sans_light"
-    >
-    <!-- Auto layout, variables, and unit scale are not yet supported -->
+    android:fontFamily="@font/public_sans_light">
 
+    <!-- Destination name is displayed; click also possible to start address activity -->
     <TextView
         android:id="@+id/destination"
         android:layout_width="match_parent"
@@ -21,6 +20,7 @@
         android:textColor="@color/black"
         android:textSize="30sp" />
 
+    <!-- Compass arrow (own design, top view bird) -->
     <ImageView
         android:id="@+id/arrow"
         android:layout_width="match_parent"
@@ -30,7 +30,7 @@
         android:layout_centerVertical="true"
         android:src="@drawable/bird_arrow" />
 
-
+    <!-- Information footer -->
     <RelativeLayout
         android:id="@+id/rectangle_1"
         android:layout_width="match_parent"
@@ -43,6 +43,7 @@
         android:visibility="visible"
         android:gravity="center">
 
+        <!-- Closing button starts map activity-->
         <ImageView
             android:layout_width="45dp"
             android:layout_height="45dp"
@@ -52,6 +53,7 @@
             android:src="@drawable/baseline_close_24"
             android:layout_alignParentLeft="true" />
 
+        <!-- Distance to destination point (frequently updated) -->
         <TextView
             android:id="@+id/distance"
             android:layout_width="wrap_content"

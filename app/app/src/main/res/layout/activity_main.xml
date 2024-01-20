@@ -5,6 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
+    <!-- Map fragment with own style -->
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/map"
@@ -13,6 +15,7 @@
         android:layout_height="match_parent"
         tools:context=".MainActivity" />
 
+    <!-- Floating search button with own design -->
     <ImageView
         android:layout_width="50dp"
         android:layout_height="50dp"
@@ -24,6 +27,61 @@
         android:padding="7dp"
         android:src="@drawable/baseline_search_24" />
 
+    <!-- Welcome message (displayed only for the first time the user opens the app) -->
+    <RelativeLayout
+        android:id="@+id/welcome"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:background="@color/secondaryColor"
+        android:padding="20dp"
+        android:visibility="gone">
+
+        <!-- Closing button for the welcome page -->
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/baseline_close_24"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:onClick="closeWelcome" />
+
+        <!-- Content of the welcome page (text) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Welcome title -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="23sp"
+                android:text="Welcome to Corvus!"
+                android:textStyle="bold"
+                android:textColor="@color/black"/>
+
+            <!-- Welcome message -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="17sp"
+                android:text="
+                \nNavigate, explore, and discover with the wisdom of a raven. Corvus transforms your journey into an adventure, guiding you through the streets with ease and revealing the hidden gems of your neighborhood.
+                \n
+                \nReady to explore?
+                \n
+                \n• Intuitive and precise navigation
+                \n• Insightful local knowledge
+                \n• Customizable routes for every traveler
+                \n• Start your journey with Corvus, where every path leads to discovery."
+                android:textColor="@color/black"/>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <!-- Footer layout (only appears when user clicked on the map to select a destination) -->
     <RelativeLayout
         android:id="@+id/startFooter"
         android:layout_width="match_parent"
@@ -36,6 +94,7 @@
         android:visibility="gone"
         android:gravity="center">
 
+        <!-- Closing button -->
         <ImageView
             android:layout_width="45dp"
             android:layout_height="45dp"
@@ -45,6 +104,7 @@
             android:src="@drawable/baseline_close_24"
             android:layout_alignParentLeft="true" />
 
+        <!-- Start button to start compass activity with selected detination -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

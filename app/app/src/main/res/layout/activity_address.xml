@@ -5,6 +5,7 @@
     android:fontFamily="@font/public_sans_light"
     android:background="@color/secondaryColor">
 
+    <!-- Header with search bar and button -->
     <LinearLayout
         android:id="@+id/searchBar"
         android:layout_width="match_parent"
@@ -12,6 +13,7 @@
         android:background="@drawable/rounded_banner_top"
         android:orientation="horizontal">
 
+        <!-- Search bar -->
         <EditText
             android:id="@+id/searchText"
             android:fontFamily="@font/public_sans_light"
@@ -22,6 +24,7 @@
             android:layout_weight="1"
             android:hint="Where do you want to go ?" />
 
+        <!-- Button to add address to the database -->
         <ImageView
             android:layout_width="50dp"
             android:layout_height="50dp"
@@ -36,7 +39,7 @@
 
     </LinearLayout>
 
-
+    <!-- List of the items of Addresses table in the database -->
     <ListView
         android:id="@+id/listAddress"
         android:fontFamily="@font/public_sans_light"
@@ -47,8 +50,10 @@
         android:paddingHorizontal="20dp"
         android:scrollbars="none"
         android:paddingTop="11dp"
-        android:stackFromBottom="false" />
+        android:stackFromBottom="false"
+        android:focusedByDefault="true"/>
 
+    <!-- Floating button to return to the previous activity -->
     <ImageView
         android:id="@+id/back"
         android:layout_width="50dp"

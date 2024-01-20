@@ -56,7 +56,7 @@ import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    // Global Variable: an instance of our DatabaseHelper class
+    // Global variable
     DatabaseHelper dbHelper;
     SQLiteDatabase database;
     Cursor dbCursor;
@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Set the Layout
         setContentView(R.layout.activity_main);
 
-        // For the map Fragment
+        // Create map fragment and ask for permissions
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         locationPermissionRequest = registerForActivityResult(
@@ -92,8 +92,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onMapReady(GoogleMap map) {
-        mMap = map;
         // Set Map Style form JSON file
+        mMap = map;
         mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.map_style));
 
         // Check if the database is already existing in the Android file system,
@@ -134,41 +134,42 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
         if(dbCursor.getCount() <= 0) {
-            // new user
+            // new user -> display welcome page
+            findViewById(R.id.welcome).setVisibility(View.VISIBLE);
         }
         else {
-
+            // define heatmap style
             int[] colors = {
-                    Color.rgb(245, 221, 66),
-                    Color.rgb(255, 0, 0)
+                    Color.rgb(186, 28, 243),
+                    Color.rgb(245, 221, 226)
             };
             float[] startPoints = {
                     0.2f, 1f
             };
             Gradient gradient = new Gradient(colors, startPoints);
 
-
+            // create and display heatmap
             HeatmapTileProvider provider = new HeatmapTileProvider.Builder()
                     .data(geoPoints)
                     .gradient(gradient)
                     .opacity(0.7)
                     .radius(30)
                     .build();
-
             mMap.addTileOverlay(new TileOverlayOptions().tileProvider(provider));
 
             try {
-                //  Block of code to try
+                // see overall view of explored area
                 mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 200));
 
             }
             catch(Exception e) {
-                //  Block of code to handle errors
+                // if cannot compute, just center on the explored area
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(builder.build().getCenter(), 10));
 
             }
         }
 
+        // ask for permissions
         String[] PERMISSIONS = {
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION
@@ -236,6 +237,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
+
+    public void closeWelcome(View view) {
+        // hide the welcome page
+        findViewById(R.id.welcome).setVisibility(View.GONE);
+    }
+
+
     public void onClickStartCompassActivity(View view) throws IOException {
         // start compass activity without animation and communicate destination (marker)
 
@@ -267,18 +275,29 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // center the map on user location with animation and start compass activity when animation is done
         // the activity is launched in any case because we have the coordinates
-        mMap.animateCamera(CameraUpdateFactory.newLatLng(userLocation), new GoogleMap.CancelableCallback() {
-            @Override
-            public void onFinish() {
-                startCompassActivity(addressName, markerLocation.latitude, markerLocation.longitude);
-            }
+        if(userLocation != null) {
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(userLocation), new GoogleMap.CancelableCallback() {
+                @Override
+                public void onCancel() {
+                    // if animation is canceled, start compass activity
+                    startCompassActivity(addressName, markerLocation.latitude, markerLocation.longitude);
+                }
 
-            @Override
-            public void onCancel() {
-                startCompassActivity(addressName, markerLocation.latitude, markerLocation.longitude);
-            }
+                @Override
+                public void onFinish() {
+                    // wait until the animation is finished to start compass acitivity
+                    startCompassActivity(addressName, markerLocation.latitude, markerLocation.longitude);
+                }
+            });
+        }
+        else {
+            // in any case start compass activity
+            startCompassActivity(addressName, markerLocation.latitude, markerLocation.longitude);
+        }
 
-        });
+
+
+
 
     }
 

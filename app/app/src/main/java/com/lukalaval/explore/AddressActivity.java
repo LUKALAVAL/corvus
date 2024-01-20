@@ -2,6 +2,7 @@ package com.lukalaval.explore;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Address;
@@ -9,6 +10,7 @@ import android.location.Geocoder;
 import android.os.Bundle;
 import android.text.Spanned;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -22,6 +24,8 @@ import android.widget.ImageView;
 import android.widget.ListView;
 
 public class AddressActivity extends AppCompatActivity {
+
+    // Global variables
     DatabaseHelper dbHelper;
     SQLiteDatabase database;
     Cursor dbCursor;
@@ -35,6 +39,8 @@ public class AddressActivity extends AppCompatActivity {
 
         backButton = findViewById(R.id.back);
         listView = findViewById(R.id.listAddress);
+
+        // if scroll to bottom, hide the return arrow to be able to read the last item from the list
         listView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
@@ -89,15 +95,6 @@ public class AddressActivity extends AppCompatActivity {
         database.execSQL("DELETE FROM addresses WHERE address = '" + addressName + "';");
         database.execSQL("INSERT INTO addresses VALUES ('" + addressName + "','" + addressLatitude + "','" + addressLongitude + "');");
     }
-
-
-
-
-
-
-
-
-
 
 
 
@@ -161,27 +158,37 @@ public class AddressActivity extends AppCompatActivity {
         EditText editText = findViewById(R.id.searchText);
         String strAddress = String.valueOf(editText.getText());
 
-        // find address from coordinates
-        Geocoder coder = new Geocoder(this);
-        List<Address> address = coder.getFromLocationName(strAddress, 1);
+        if(strAddress.length() > 0) {
+            // find address from coordinates
+            Geocoder coder = new Geocoder(this);
+            List<Address> address = coder.getFromLocationName(strAddress, 1);
 
-        // get the address official name and coordinates
-        String addressName = null;
-        double addressLatitude = 0.0;
-        double addressLongitude = 0.0;
-        if(!address.isEmpty()) {
-            addressName = address.get(0).getAddressLine(0);
-            addressLatitude = address.get(0).getLatitude();
-            addressLongitude = address.get(0).getLongitude();
-        }
-        else {
-            // the address was not found
-        }
+            // get the address official name and coordinates
+            String addressName = null;
+            double addressLatitude = 0.0;
+            double addressLongitude = 0.0;
+            if(!address.isEmpty()) {
+                // if the address actually exists
+                addressName = address.get(0).getAddressLine(0);
+                addressLatitude = address.get(0).getLatitude();
+                addressLongitude = address.get(0).getLongitude();
+
+                // hide keyboard
+                InputMethodManager inm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                inm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),0);
+
+                // empty search bar
+                editText.setText("");
+            }
+            else {
+                // the address was not found
+            }
 
 
-        // insert the new values in the database
-        if(addressName != null) {
-            updateDatabase(addressName, addressLatitude, addressLongitude);
+            // insert the new values in the database
+            if(addressName != null) {
+                updateDatabase(addressName, addressLatitude, addressLongitude);
+            }
         }
 
         // update list view with the updated database

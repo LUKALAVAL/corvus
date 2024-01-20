@@ -19,7 +19,9 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.View;
+import android.view.animation.Animation;
 import android.widget.Button;
+import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,6 +34,7 @@ import java.io.IOException;
 
 public class CompassActivity extends AppCompatActivity {
 
+    // GLobal variables
     double userLatitude = 0.0;
     double userLongitude = 0.0;
     double userHeading = 0.0;
@@ -53,13 +56,16 @@ public class CompassActivity extends AppCompatActivity {
 
         // parse intent to define destination point (name and coordinates)
         Intent intent = getIntent();
-        String destName = intent.getStringExtra("address");
-        destLatitude = intent.getDoubleExtra("latitude", 51.031853286422695);
-        destLongitude = intent.getDoubleExtra("longitude", 13.781032754239025);
+        destName = intent.getStringExtra("address");
+        destLatitude = intent.getDoubleExtra("latitude", 0.0);
+        destLongitude = intent.getDoubleExtra("longitude", 0.0);
 
         // display destination name
         TextView destinationTV = findViewById(R.id.destination);
         destinationTV.setText(destName);
+
+
+
 
         // activate database
         dbHelper = new DatabaseHelper(this);
@@ -87,9 +93,7 @@ public class CompassActivity extends AppCompatActivity {
                     userLatitude = location.getLatitude();
                     userLongitude = location.getLongitude();
                     Long tsLong = System.currentTimeMillis();
-
                     database.execSQL("INSERT INTO tracks VALUES ('" + tsLong + "','" + userLatitude + "','" + userLongitude + "');");
-                    System.out.println(userLatitude + " " + userLongitude);
 
                     // update distance and display it
                     double distance = calculateDistance(userLatitude, userLongitude, destLatitude, destLongitude);
@@ -161,22 +165,22 @@ public class CompassActivity extends AppCompatActivity {
                     lastAccelerometerSet[0] = true;
                 }
 
+                // in this case we habe values for the magnetometer and the accelerometer, we can now computer the heading
                 if (lastMagnetometerSet[0] && lastAccelerometerSet[0]) {
                     SensorManager.getRotationMatrix(rotationMatrix, null, lastAccelerometer, lastMagnetometer);
                     SensorManager.getOrientation(rotationMatrix, orientation);
 
+                    // compute user heading from 0 to 360
                     float azimuthInRadians = orientation[0];
                     double azimuthInDegrees = (Math.toDegrees(azimuthInRadians) + 360) % 360;
-
                     userHeading = azimuthInDegrees;
 
                     // calculate the angle between the user heading and a line between user location and destination
                     double angle = calculateAngle(userHeading, userLatitude, userLongitude, destLatitude, destLongitude);
 
-                    // update image orientation on UI
+                    // update image orientation on UI to point towards the destination
                     ImageView arrowImage = findViewById(R.id.arrow);
                     arrowImage.setRotation((float) angle);
-
                 }
             }
 
