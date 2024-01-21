@@ -40,24 +40,6 @@ public class AddressActivity extends AppCompatActivity {
         backButton = findViewById(R.id.back);
         listView = findViewById(R.id.listAddress);
 
-        // if scroll to bottom, hide the return arrow to be able to read the last item from the list
-        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(AbsListView view, int scrollState) {
-                if(listView.getLastVisiblePosition() >= listView.getCount()-1) {
-                    backButton.setVisibility(View.GONE);
-                }
-                else {
-                    backButton.setVisibility(View.VISIBLE);
-                }
-            }
-
-            @Override
-            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-
-            }
-        });
-
         // activate database
         dbHelper = new DatabaseHelper(this);
         try {
@@ -103,7 +85,7 @@ public class AddressActivity extends AppCompatActivity {
 
     public void refreshList() {
         // update the list view in the user interface
-        dbCursor = database.rawQuery("SELECT * FROM addresses;",null );
+        dbCursor = database.rawQuery("SELECT * FROM addresses LIMIT 30;",null );
         ArrayAdapter<CharSequence> adapter = createAdapterHtml(dbCursor);
         listView.setAdapter(adapter);
     }
@@ -115,16 +97,21 @@ public class AddressActivity extends AppCompatActivity {
         int length = cursor.getCount();
         cursor.moveToFirst();
 
-        Spanned[] html_array = new Spanned[length];
+        Spanned[] html_array = new Spanned[length+2];
 
         int index_address = cursor.getColumnIndex("address");
 
-
+        // make items appear in the right order
         for (int i = length-1; i >= 0; i--) {
 
             html_array[i] = Html.fromHtml(cursor.getString(index_address));
             cursor.moveToNext();
         }
+
+        // adding space at the bottom so that the return arrow doesn't hide any item
+        html_array[length] = Html.fromHtml("");
+        html_array[length+1] = Html.fromHtml("");
+
 
         ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(this,
                 R.layout.list_item, html_array);
